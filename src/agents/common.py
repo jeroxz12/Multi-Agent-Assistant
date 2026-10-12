@@ -29,3 +29,13 @@ def print_result(result: dict) -> None:
         print(f"razon: {result['reason']}")
     for source in result["sources"]:
         print(f"- {source['source']} (score {source['score']})")
+    scores = result.get("scores")
+    if scores:
+        print(
+            "evaluacion: "
+            f"calidad {scores['quality']}/10, "
+            f"relevancia {scores['relevance']}, "
+            f"completitud {scores['completeness']}, "
+            f"exactitud {scores['accuracy']}"
+        )
+        print(scores["comment"])

@@ -26,7 +26,7 @@ form.addEventListener("submit", async (event) => {
   }
 
   submit.disabled = true;
-  status.textContent = "Clasificando y buscando en la documentación…";
+  status.textContent = "Clasificando, buscando y evaluando la respuesta…";
   result.hidden = true;
 
   try {
@@ -48,6 +48,25 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
+function renderScores(scores) {
+  const block = document.querySelector("#scores");
+  const fields = ["quality", "relevance", "completeness", "accuracy"];
+  if (!scores) {
+    block.hidden = true;
+    for (const field of fields) {
+      document.querySelector(`#score-${field}`).textContent = "";
+    }
+    document.querySelector("#score-comment").textContent = "";
+    return;
+  }
+  block.hidden = false;
+  document.querySelector("#score-quality").textContent = `${scores.quality}/10`;
+  document.querySelector("#score-relevance").textContent = scores.relevance;
+  document.querySelector("#score-completeness").textContent = scores.completeness;
+  document.querySelector("#score-accuracy").textContent = scores.accuracy;
+  document.querySelector("#score-comment").textContent = scores.comment;
+}
+
 function messageFrom(body) {
   if (typeof body.detail === "string") {
     return body.detail;
@@ -64,6 +83,7 @@ function render(body) {
     `Confianza ${Math.round(body.confidence * 100)}%`;
   document.querySelector("#reason").textContent = body.reason;
   document.querySelector("#answer").textContent = body.answer;
+  renderScores(body.scores);
 
   const sources = document.querySelector("#sources");
   sources.replaceChildren();

@@ -10,10 +10,18 @@ Sistema de routing para consultas internas de Nubiq, una empresa SaaS ficticia. 
 4. El clasificador devuelve departamento, confianza y una razón.
 5. Si la confianza es menor a 0,6, no se abre ninguna rama.
 6. El agente elegido recupera 4 chunks de su namespace y redacta solo con eso.
-7. Langfuse registra la clasificación, la búsqueda y la generación en la misma ejecución.
-8. `POST /api/query` expone esa misma función por HTTP. La pantalla en `/` la llama y muestra el departamento, la razón y los fragmentos.
+7. Langfuse registra la clasificación, la búsqueda, la generación y las notas del evaluador en la misma ejecución.
+8. `POST /api/query` expone esa función por HTTP. La pantalla en `/` muestra el departamento, la razón, la evaluación y los fragmentos.
 
-La interfaz y el evaluador vienen después.
+## Decisiones técnicas
+
+- **LangChain con LCEL y `RunnableBranch`.** El flujo es una tubería con una bifurcación. El clasificador devuelve un objeto `RouteDecision` (departamento, confianza, razón) y el router abre una sola rama. Esos pasos quedan con nombre en la traza: `orchestrator`, `rag_hr`, `rag_tech`, `rag_finance`.
+- **Una colección de Pinecone por departamento.** Los namespaces `hr`, `tech` y `finance` viven en el mismo índice. La búsqueda de un agente no entra en los vectores de otro.
+- **Chunks de 800 caracteres con 120 de solapamiento, y 4 fragmentos por respuesta.** El corte conserva el sentido de una política. Si un dominio no llega a 50 chunks, se agregan documentos en lugar de achicar el corte.
+- **`gpt-4o-mini` con temperatura 0 y `text-embedding-3-small`.** La clasificación y las respuestas se mantienen estables entre pruebas, con un coste bajo.
+- **Confianza mínima de 0,6.** Por debajo de ese umbral no se abre ninguna rama y se pide reformular la pregunta.
+- **FastAPI y una página estática.** El endpoint traduce HTTP a `answer()`. La pantalla es otro cliente de esa misma función.
+- **El evaluador corre después de la respuesta.** Puntúa relevancia, completitud, exactitud y una nota general de 1 a 10, y las escribe en la traza con la Score API de Langfuse. No modifica el texto que ve quien preguntó. Una consulta fuera de alcance no se puntúa, porque no hubo respuesta RAG.
 
 ## Requisitos
 
@@ -68,9 +76,10 @@ curl -s http://127.0.0.1:8000/api/query \
 
 Los Markdown de `data/` son la fuente. Pinecone guarda el índice derivado.
 
-## Límites de esta etapa
+## Límites
 
 - El router elige el departamento. Los comandos `hr_agent`, `tech_agent` y `finance_agent` siguen sirviendo para hablarle a un solo agente.
 - Una confianza menor a 0,6 no abre rama.
-- No hay memoria de la conversación anterior.
-- Cada ingesta y cada pregunta consumen créditos de OpenAI. Pinecone almacena los vectores.
+- El evaluador no puntúa las consultas fuera de alcance.
+- No hay memoria de la conversación anterior. El endpoint local no tiene autenticación.
+- Cada ingesta, cada pregunta y cada evaluación consumen créditos de OpenAI. Pinecone almacena los vectores.

@@ -179,6 +179,36 @@ textarea:focus {
   font-size: 18px;
 }
 
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.score-grid div {
+  margin: 0;
+}
+
+.score-grid dt {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.score-grid dd {
+  margin: 4px 0 0;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 28px;
+}
+
+#score-comment {
+  margin: 12px 0 0;
+  color: var(--muted);
+}
+
 #result h2 {
   margin-top: 24px;
 }
@@ -222,5 +252,9 @@ textarea:focus {
   .actions {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .score-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

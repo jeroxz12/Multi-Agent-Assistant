@@ -25,12 +25,21 @@ class SourceChunk(BaseModel):
     score: float
 
 
+class QualityScoresResponse(BaseModel):
+    relevance: int
+    completeness: int
+    accuracy: int
+    quality: int
+    comment: str
+
+
 class QueryResponse(BaseModel):
     answer: str
     department: str
     confidence: float
     reason: str
     sources: list[SourceChunk]
+    scores: QualityScoresResponse | None = None
 
 
 @app.get("/")

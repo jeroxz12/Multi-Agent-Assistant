@@ -2,6 +2,31 @@
 
 Sistema de routing para consultas internas de Nubiq, una empresa SaaS ficticia. Una pregunta entra por `answer()`. El orquestador elige RR. HH., IT, Finance o fuera de alcance, y el router abre una sola rama RAG.
 
+## Recorrido de una pregunta
+
+La pantalla y `POST /api/query` llaman a la misma función. Langfuse registra todo el camino en una traza llamada `multi_agent`.
+
+```mermaid
+flowchart TD
+    pregunta["Pregunta"] --> clasificador["Clasificador: departamento, confianza y razón"]
+    clasificador --> umbral{"Confianza de al menos 0,6"}
+    umbral -->|No| reformular["Pedir que reformule. Sin búsqueda."]
+    umbral -->|Sí| equipo{"Departamento"}
+    equipo -->|RR. HH.| hr["Buscar 4 fragmentos en el namespace hr"]
+    equipo -->|IT| tech["Buscar 4 fragmentos en el namespace tech"]
+    equipo -->|Finance| fin["Buscar 4 fragmentos en el namespace finance"]
+    equipo -->|Fuera de alcance| rechazo["Rechazar. Sin búsqueda."]
+    hr --> respuesta["Redactar solo con esos fragmentos"]
+    tech --> respuesta
+    fin --> respuesta
+    respuesta --> nota["Evaluar de 1 a 10 y guardar las notas en la misma traza"]
+    nota --> conNota["Respuesta con notas"]
+    reformular --> sinNota["Respuesta sin notas"]
+    rechazo --> sinNota
+```
+
+Vacaciones baja por RR. HH. hasta la nota. Un despido sale por «Fuera de alcance» y no toca Pinecone ni el evaluador.
+
 ## Qué hay ahora
 
 1. Las políticas viven en `data/hr_docs/`, `data/tech_docs/` y `data/finance_docs/`.

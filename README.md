@@ -27,7 +27,7 @@ flowchart TD
 
 Vacaciones baja por RR. HH. hasta la nota. Un despido sale por «Fuera de alcance» y no toca Pinecone ni el evaluador.
 
-## Qué hay ahora
+## El sistema
 
 1. Las políticas viven en `data/hr_docs/`, `data/tech_docs/` y `data/finance_docs/`.
 2. Cada carpeta se parte en chunks y se convierte en embeddings.
@@ -64,7 +64,7 @@ cp .env.example .env
 
 Completá `.env` con tus claves. No lo subas al repositorio.
 
-## Primer recorrido
+## Ejecución
 
 Desde la raíz del proyecto, con el entorno activo:
 
@@ -101,10 +101,34 @@ curl -s http://127.0.0.1:8000/api/query \
 
 Los Markdown de `data/` son la fuente. Pinecone guarda el índice derivado.
 
+## Qué se puede cambiar
+
+Los valores de abajo son los que usa el sistema hoy. Cambiarlos no rearma el proyecto.
+
+| Ajuste | Valor actual | Dónde |
+| --- | --- | --- |
+| Umbral de confianza | 0,6 | `route_confidence_threshold` en `src/config.py` |
+| Fragmentos por respuesta (top k) | 4 | `retriever_k` en `src/config.py` |
+| Tamaño de chunk y solapamiento | 800 y 120 | `chunk_size` y `chunk_overlap` en `src/config.py` |
+| Modelo de respuesta y de embeddings | `gpt-4o-mini`, `text-embedding-3-small` | `chat_model` y `embedding_model` en `src/config.py` |
+| Políticas de un equipo | los Markdown de esa carpeta | `data/hr_docs/`, `data/tech_docs/` o `data/finance_docs/` |
+
+El umbral y el top k aplican en la próxima pregunta. Un cambio de chunk, o un Markdown editado, pide volver a ingestar ese namespace: `python -m src.ingest hr` (o `tech`, o `finance`). Si el modelo de embeddings cambia de dimensión, el índice de Pinecone hay que crearlo de nuevo: el actual es de 1536.
+
+Para sumar un agente, por ejemplo Legal:
+
+1. Crear `data/legal_docs/` con sus Markdown.
+2. Agregar `legal` a `DOMAINS` en `src/config.py`.
+3. Escribir el prompt en `src/agents/legal_agent.py`, con las mismas reglas que los otros: responder solo con el contexto y citar el archivo.
+4. Sumar ese prompt a `PROMPTS` y una rama en el `RunnableBranch` de `src/routing.py`.
+5. Sumar `legal` al tipo `Department` y al texto del clasificador en `src/agents/orchestrator.py`.
+6. Sumar la etiqueta en `LABELS` de `ui/app.js`.
+7. Cargar el namespace con `python -m src.ingest legal`.
+
+`python -m src.agents.hr_agent` (y lo mismo con `tech_agent` y `finance_agent`) habla con un solo agente, sin pasar por el clasificador.
+
 ## Límites
 
-- El router elige el departamento. Los comandos `hr_agent`, `tech_agent` y `finance_agent` siguen sirviendo para hablarle a un solo agente.
-- Una confianza menor a 0,6 no abre rama.
 - El evaluador no puntúa las consultas fuera de alcance.
 - No hay memoria de la conversación anterior. El endpoint local no tiene autenticación.
 - Cada ingesta, cada pregunta y cada evaluación consumen créditos de OpenAI. Pinecone almacena los vectores.

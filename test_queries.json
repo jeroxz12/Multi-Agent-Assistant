@@ -1,0 +1,62 @@
+[
+  {
+    "id": "vacaciones",
+    "query": "¿Cuántos días de vacaciones corresponden después de 2 años en la empresa?",
+    "expected_department": "hr"
+  },
+  {
+    "id": "matrimonio",
+    "query": "¿Cuántos días de licencia corresponden por matrimonio?",
+    "expected_department": "hr"
+  },
+  {
+    "id": "cumpleanos",
+    "query": "¿El día de mi cumpleaños descuenta vacaciones?",
+    "expected_department": "hr"
+  },
+  {
+    "id": "vpn",
+    "query": "No puedo conectarme a la VPN desde casa. ¿Qué reviso primero?",
+    "expected_department": "tech"
+  },
+  {
+    "id": "nt401",
+    "query": "Nubiq Tunnel me muestra NT-401. ¿Qué significa y dónde cambio la contraseña?",
+    "expected_department": "tech"
+  },
+  {
+    "id": "portal-nomina-acceso",
+    "query": "No puedo entrar al portal de nómina. Me dice acceso denegado.",
+    "expected_department": "tech"
+  },
+  {
+    "id": "reembolso",
+    "query": "¿Cómo solicito el reembolso de un viaje de trabajo?",
+    "expected_department": "finance"
+  },
+  {
+    "id": "fecha-pago",
+    "query": "¿Qué día se paga el sueldo en Argentina?",
+    "expected_department": "finance"
+  },
+  {
+    "id": "hotel",
+    "query": "¿Cuál es el tope de hotel por noche en Buenos Aires?",
+    "expected_department": "finance"
+  },
+  {
+    "id": "nomina-fecha",
+    "query": "¿Cuándo se paga la nómina?",
+    "expected_department": "finance"
+  },
+  {
+    "id": "despido",
+    "query": "¿Qué indemnización corresponde por un despido improcedente?",
+    "expected_department": "out_of_scope"
+  },
+  {
+    "id": "clima",
+    "query": "¿Va a llover mañana en Buenos Aires?",
+    "expected_department": "out_of_scope"
+  }
+]

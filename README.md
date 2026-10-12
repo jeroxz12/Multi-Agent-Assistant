@@ -11,8 +11,9 @@ Sistema de routing para consultas internas de Nubiq, una empresa SaaS ficticia. 
 5. Si la confianza es menor a 0,6, no se abre ninguna rama.
 6. El agente elegido recupera 4 chunks de su namespace y redacta solo con eso.
 7. Langfuse registra la clasificación, la búsqueda y la generación en la misma ejecución.
+8. `POST /api/query` expone esa misma función por HTTP. La pantalla en `/` la llama y muestra el departamento, la razón y los fragmentos.
 
-El endpoint, la interfaz y el evaluador vienen después. El repaso del código es antes del evaluador.
+La interfaz y el evaluador vienen después.
 
 ## Requisitos
 
@@ -41,6 +42,16 @@ python -m src.ingest hr
 python -m src.ingest tech
 python -m src.ingest finance
 python -m src.multi_agent_system "¿Cuántos días de vacaciones corresponden después de 2 años en la empresa?"
+uvicorn src.api:app --reload
+```
+
+Con el servidor levantado, la pantalla está en [http://127.0.0.1:8000/](http://127.0.0.1:8000/). La misma pregunta por HTTP:
+
+```bash
+curl -s http://127.0.0.1:8000/health
+curl -s http://127.0.0.1:8000/api/query \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"¿Cuántos días de vacaciones corresponden después de 2 años en la empresa?"}'
 ```
 
 `src.documents` solo muestra cómo quedó partido el texto. `src.ingest` crea el índice si no existe y carga el namespace que se le pasa (`hr`, `tech` o `finance`). Volver a correr la ingesta borra ese namespace y lo carga de nuevo.

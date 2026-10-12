@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nubiq · Soporte interno</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Nubiq</p>
+        <h1>Soporte interno</h1>
+        <p class="lede">
+          Escribí la consulta. El clasificador elige un equipo y un solo agente
+          responde con la documentación de ese departamento.
+        </p>
+      </header>
+
+      <form id="query-form">
+        <label for="query">Consulta</label>
+        <textarea
+          id="query"
+          name="query"
+          rows="4"
+          required
+          placeholder="Por ejemplo: ¿Cuántos días de vacaciones corresponden después de 2 años?"
+        ></textarea>
+        <div class="examples" aria-label="Ejemplos">
+          <button type="button" data-example="¿Cuántos días de vacaciones corresponden después de 2 años en la empresa?">
+            Vacaciones
+          </button>
+          <button type="button" data-example="No puedo conectarme a la VPN desde casa. ¿Qué reviso primero?">
+            VPN
+          </button>
+          <button type="button" data-example="¿Cómo solicito el reembolso de un viaje de trabajo?">
+            Reembolso
+          </button>
+          <button type="button" data-example="¿Qué indemnización corresponde por un despido improcedente?">
+            Despido
+          </button>
+        </div>
+        <div class="actions">
+          <button type="submit" id="submit">Consultar</button>
+          <p id="status" role="status"></p>
+        </div>
+      </form>
+
+      <section id="result" hidden>
+        <div class="meta">
+          <span id="department" class="chip"></span>
+          <span id="confidence"></span>
+        </div>
+        <p id="reason"></p>
+        <h2>Respuesta</h2>
+        <p id="answer"></p>
+        <h2>Fragmentos usados</h2>
+        <ul id="sources"></ul>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
